@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Data Visualization Belgrade Workshop01</title>
+    <title>Bar chart</title>
 
     <script src="https://code.jquery.com/jquery-2.2.4.min.js"
             integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
@@ -16,9 +16,20 @@
     <link rel="stylesheet" href="main.css">
 </head>
 <body>
-    <div class="wrapper">
-        <div class="scatter-plot"></div>
-        <div class="legend-wrapper"></div>
+<div class="wrapper clearfix">
+    <div class="scatter-plot clearfix"></div>
+    <div class="legend-wrapper clearfix">
+        <div class="stage-legend legend">
+            <h3>Pathological Stage</h3>
+        </div>
+        <div class="gender-legend legend">
+            <h3>Gender</h3>
+        </div>
+
+        <div class="disease-legend legend">
+            <h3>Disease Type</h3>
+        </div>
     </div>
+</div>
 </body>
 </html>

@@ -8,11 +8,9 @@ body {
     font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
     font-weight: 300;
 }
-
 h3 {
     font-size: 15px;
 }
-
 .wrapper {
 
     width: 100%;
@@ -35,16 +33,136 @@ h3 {
 }
 
 .scatter-plot {
-    display: flex;
-
     width: 800px;
     height: 700px;
-
     padding: 5px;
     padding-top: 0;
+    display: flex;
+}
 
-    border: 1px solid #444;
+.bar { fill: #8cd1c4; }
 
+.line {
+    fill: none;
+    stroke: steelblue;
+    stroke-width: 2px;
+}
+
+.grid line {
+    stroke: #bbbdbb;
+    stroke-opacity: 0.7;
+    shape-rendering: crispEdges;
+}
+
+.grid path {
+    stroke-width: 0;
+}
+
+.axis path {
+    stroke: transparent;
+}
+
+.axis--x path, .axis path{
+    stroke: #bbbdbb;
+    stroke-opacity: 0.7;
+    shape-rendering: crispEdges;
+}
+
+.tick text {
+    fill: #bbbdbb;
+    user-select: none;
+}
+
+.tick line {
+    stroke: #bbbdbb;
+}
+.dot {
+
+
+    fill-opacity: 0;
+
+
+    stroke-opacity: 0.6;
+    shape-rendering: crispEdges;
+
+
+}
+
+.hidden {
+    fill-opacity: 0;
+    stroke-opacity: 0;
+}
+
+.dot.dot_red {
+    stroke: #aa3232;
+    fill: #aa3232;
+}
+
+.dot.dot_blue{
+    stroke: #3232aa;
+    fill: #3232aa;
+}
+
+.axis-label {
+    fill: #bbbdbb;
+    user-select: none;
+}
+
+.legend {
+    margin-top: 10px;
+    width: 150px;
+    display: flex;
+    color: #bbbdbb;
+    flex-direction: column;
+}
+
+.legend.disease-legend.legend {
+    width: 300px;
+}
+
+.legend.gender-legend.legend {
+    width: 100px;
+    margin-right: 10px;
+}
+
+.legend--item {
+    margin: 5px 0;
+}
+
+.gender-legend--item {
+    margin: 4px 0;
+}
+
+.legend--item-color {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    margin-right: 5px;
+    /*margin-bottom: 1px;*/
+}
+
+.gender-legend--item svg {
+    margin-right: 7px;
+}
+
+.legend input {
+    display: inline-block;
+    width: 13px;
+    height: 13px;
+    padding: 0;
+    margin: 0;
+    margin-right: 5px;
+    vertical-align: bottom;
+    position: relative;
+    /*top: -1px;*/
+}
+
+.legend .clickable {
+    cursor: pointer;
+}
+
+.legend h3 {
+    margin-bottom: 3px;
 }
 
 /**
