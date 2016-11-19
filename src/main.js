@@ -20,7 +20,7 @@ $(function () {
 // append the svg object to the body of the page
 // append a 'group' element to 'svg'
 // moves the 'group' element to the top left margin
-    var svg = d3.select(".bar-chart").append("svg")
+    var svg = d3.select(".scatter-plot").append("svg")
         .attr("width", width + margin.left + margin.right + DEFAULTS.legend_width)
         .attr("height", height + margin.top + margin.bottom + DEFAULTS.brush_height)
         .append("g")
