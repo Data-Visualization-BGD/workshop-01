@@ -1,17 +1,16 @@
 $(function () {
 
     var DEFAULTS = {
-        tick_count: 10,
-        x_tick_count: 16,
-        bar_color: '#8cd1c4',
-        bar_width: 2,
-        top_circle_radius: 6,
-        x_offset: 10,
-        legend_width: 0,
-        brush_height: 200,
-
-        graph_width: 800,
-        graph_height: 500
+        tick_count          : 10,
+        x_tick_count        : 16,
+        bar_color           : '#8cd1c4',
+        bar_width           : 2,
+        top_circle_radius   : 6,
+        x_offset            : 10,
+        legend_width        : 0,
+        brush_height        : 200,
+        graph_width         : 800,
+        graph_height        : 500
     };
 
     var margin = {top: 20, right: 20, bottom: 50, left: 60},
@@ -54,23 +53,7 @@ $(function () {
         });
 
     tip.direction(function(d) {
-        // var _x = x(d.case_days_to_death);
-        // var _y = x(d.case_age_at_diagnosis);
-        // var _x_range = x.range();
-        // var _y_range = x.range();
-        //
-        // var _pos = 'n';
-        //
-        // if (_y < _y_range[1] / 3) {
-        //     _pos = 's';
-        // }
-        //
-        // if (_x < _x_range[1] / 3) {
-        //     _pos = 'se'
-        // }
-        var _pos = 'se';
-
-        return _pos;
+        return 'se';
     });
 
     svg.call(tip);
@@ -112,23 +95,13 @@ $(function () {
     };
 
     var symbol = d3.symbol();
-
     var color20 = d3.scaleOrdinal(d3.schemeCategory20c);
 
     var DOT_SHAPE = symbol.type(function(d){
-
-
         if (d.case_gender === 'MALE') {
-            //return d3.symbolDiamond;
             return d3.symbolTriangle;
-
         }
-        // //return d3.symbolDiamond;
-        //return d3.symbolCircle;
-        //return d3.symbolStar;
-        //return d3.symbolTriangle;
         return d3.symbolSquare;
-        //return d3.symbolCross;
     });
 // get the data
     d3.tsv("../tcga-cases.tsv", function (error, d) {
@@ -144,9 +117,10 @@ $(function () {
             disease_visibility_map[d.case_disease_type] = true;
         });
 
+
+        //axes domains
         x.domain([d3.min(data, function (d) { return +d.case_days_to_death; }), d3.max(data, function (d) { return +d.case_days_to_death; })]);
         x2.domain([d3.min(data, function (d) { return +d.case_days_to_death; }), d3.max(data, function (d) { return +d.case_days_to_death; })]);
-
         y.domain([d3.min(data, function (d) { return +d.case_age_at_diagnosis; }), d3.max(data, function(d) { return +d.case_age_at_diagnosis; })]);
 
         // Add the scatterplot
@@ -225,8 +199,8 @@ $(function () {
             svg.selectAll(".dot")
                 .attr("transform", function(d) {
 
-                    var _x = x(d.case_days_to_death),
-                        _y = y(d.case_age_at_diagnosis);
+                    var _x = x(d.case_days_to_death);
+                    var _y = y(d.case_age_at_diagnosis);
 
                     if ( _x < _range[0]  || _x > _range[1] ) { // optimisation, move only affected
                         return;
