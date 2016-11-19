@@ -1,0 +1,23 @@
+{
+  "name": "workshop-01",
+  "version": "1.0.0",
+  "description": "Data Visualization Belgrade Workshop01",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Data-Visualization-BGD/workshop-01.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Data-Visualization-BGD/workshop-01/issues"
+  },
+  "homepage": "https://github.com/Data-Visualization-BGD/workshop-01#readme",
+  "dependencies": {
+    "http-server": "^0.9.0",
+    "lodash": "^4.17.2"
+  }
+}
