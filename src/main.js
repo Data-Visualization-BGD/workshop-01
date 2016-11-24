@@ -13,9 +13,25 @@ $(function () {
         graph_height        : 500
     };
 
+    var Data = (function () {
+        var _data = {};
+
+        return {
+            set: function (d) {
+                _data = d;
+            },
+
+            get: function () {
+                return _data;
+            }
+        }
+    })();
+
     var margin = {top: 20, right: 20, bottom: 50, left: 60},
         width = DEFAULTS.graph_width - margin.left - margin.right,
         height = DEFAULTS.graph_height - margin.top - margin.bottom;
+
+    var Tip;
 
 // set the ranges
     var x = d3.scaleLinear()
@@ -36,59 +52,9 @@ $(function () {
         .append("g")
         .attr("transform",
             "translate(" + margin.left + "," + margin.top + ")");
-    // Define the div for the tooltip
-    var tip = d3.tip()
-        .attr('class', 'd3-tip')
-        .offset([-10, 0])
-        .html(function (d) {
-
-            html = '';
-            html += '<p><span class="label">Age at diagnosis</span>:   ' + d.case_age_at_diagnosis + "</p>";
-            html += '<p><span class="label">Days to death</span>:   ' + d.case_days_to_death + "</p>";
-            html += '<p><span class="label">Gender </span>:   ' + d.case_gender + "</p>";
-            html += '<p><span class="label">Disease Type</span>:   ' + d.case_disease_type + "</p>";
-            html += '<p><span class="label">Pathological Stage</span>:   ' + d.case_pathologic_stage + "</p>";
-
-            return html;
-        });
-
-    tip.direction(function(d) {
-        return 'se';
-    });
-
-    svg.call(tip);
-
-    var STAGES = [
-        'I or II NOS',
-        'Not available',
-        'Stage 0',
-        'Stage I',
-        'Stage IA',
-        'Stage IB',
-        'Stage II',
-        'Stage IIA',
-        'Stage IIB',
-        'Stage IIC',
-        'Stage III',
-        'Stage IIIA',
-        'Stage IIIB',
-        'Stage IIIC',
-        'Stage IS',
-        'Stage IV',
-        'Stage IVA',
-        'Stage IVB',
-        'Stage IVC',
-        'Stage Tis',
-        'Stage X'
-    ];
 
     var stages_visibility_map = {};
     var disease_visibility_map = {};
-
-    _.forEach(STAGES, function (stage) {
-        stages_visibility_map[stage] = true;
-    });
-
     var gender_visibility_map = {
         'MALE': true,
         'FEMALE': true
@@ -103,13 +69,22 @@ $(function () {
         }
         return d3.symbolSquare;
     });
+
 // get the data
     d3.tsv("../tcga-cases.tsv", function (error, d) {
         if (error) throw error;
 
-        var data = _.filter(d, function (item) {
-            return item.case_days_to_death !== '0' && d.case_age_at_diagnosis !== '0';
-        });
+        Data.set(d);
+
+        parseData();
+        intiTooltips();
+        createPlot();
+        add_legend();
+
+    });
+
+    var parseData = function () {
+        var data = Data.get();
 
         // parse unique disease types and cash then in a hit map
         var _uniqDisease =_.uniqBy(data, 'case_disease_type');
@@ -117,7 +92,17 @@ $(function () {
             disease_visibility_map[d.case_disease_type] = true;
         });
 
+        var _stages = _.uniqBy(data, 'case_pathologic_stage');
+        color20.domain(_stages.map(function(d) {return d.case_pathologic_stage}));
+        _.forEach(_stages, function (d) {
+            var _stage = d.case_pathologic_stage;
+            stages_visibility_map[_stage] = true;
+        });
 
+    };
+
+    var createPlot = function () {
+        var data = Data.get();
         //axes domains
         x.domain([d3.min(data, function (d) { return +d.case_days_to_death; }), d3.max(data, function (d) { return +d.case_days_to_death; })]);
         x2.domain([d3.min(data, function (d) { return +d.case_days_to_death; }), d3.max(data, function (d) { return +d.case_days_to_death; })]);
@@ -128,11 +113,11 @@ $(function () {
             .data(data)
             .enter().append("path")
             .attr('class', 'dot')
-            .attr('stroke', function (d) { var index = STAGES.indexOf(d.case_pathologic_stage); return color20(index); })
+            .attr('stroke', function (d) {return color20(d.case_pathologic_stage); })
             .attr('d', DOT_SHAPE)
             .attr("transform", function(d) { return "translate(" + x(d.case_days_to_death) + "," + y(d.case_age_at_diagnosis) + ")"; })
-            .on('mouseover', tip.show)
-            .on('mouseout', tip.hide);
+            .on('mouseover', Tip.show)
+            .on('mouseout', Tip.hide);
 
 
         var xAxis = d3.axisBottom(x).ticks(DEFAULTS.x_tick_count);
@@ -162,7 +147,6 @@ $(function () {
         /**
          * Brush
          */
-
 
         var brush = d3.select(".scatter-plot svg");
 
@@ -211,11 +195,31 @@ $(function () {
                 .attr('visibility', visibility_func);
 
         }
+    };
 
-        add_legend();
+    var intiTooltips = function () {
+        // Define the div for the tooltip
+        Tip = d3.tip()
+            .attr('class', 'd3-tip')
+            .offset([-10, 0])
+            .html(function (d) {
 
-    });
+                html = '';
+                html += '<p><span class="label">Age at diagnosis</span>:   ' + d.case_age_at_diagnosis + "</p>";
+                html += '<p><span class="label">Days to death</span>:   ' + d.case_days_to_death + "</p>";
+                html += '<p><span class="label">Gender </span>:   ' + d.case_gender + "</p>";
+                html += '<p><span class="label">Disease Type</span>:   ' + d.case_disease_type + "</p>";
+                html += '<p><span class="label">Pathological Stage</span>:   ' + d.case_pathologic_stage + "</p>";
 
+                return html;
+            });
+
+        Tip.direction(function(d) {
+            return 'se';
+        });
+
+        svg.call(Tip);
+    };
 
     var visibility_func = function (d) {
         var _range = x.range();
@@ -240,7 +244,9 @@ $(function () {
          */
         var stage_legend = d3.select('.stage-legend')
             .selectAll('.legend--item')
-            .data(STAGES)
+            .data(_.map(stages_visibility_map, function (val, key) {
+                return key;
+            }).sort())
             .enter()
             .append('p')
             .attr('class', 'legend--item clickable');
@@ -349,7 +355,6 @@ $(function () {
             disease_visibility_map[d] = !checked;
             filter_data();
         });
-
 
     }
 
