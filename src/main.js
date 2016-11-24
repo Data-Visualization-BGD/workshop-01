@@ -55,10 +55,7 @@ $(function () {
 
     var stages_visibility_map = {};
     var disease_visibility_map = {};
-    var gender_visibility_map = {
-        'MALE': true,
-        'FEMALE': true
-    };
+    var gender_visibility_map = {};
 
     var symbol = d3.symbol();
     var color20 = d3.scaleOrdinal(d3.schemeCategory20c);
@@ -93,12 +90,18 @@ $(function () {
         });
 
         var _stages = _.uniqBy(data, 'case_pathologic_stage');
-        color20.domain(_stages.map(function(d) {return d.case_pathologic_stage}));
         _.forEach(_stages, function (d) {
             var _stage = d.case_pathologic_stage;
             stages_visibility_map[_stage] = true;
         });
 
+        var _genders = _.uniqBy(data, 'case_gender');
+        _.forEach(_genders, function (d) {
+            var _gender = d.case_gender;
+            gender_visibility_map[_gender] = true;
+        });
+
+        color20.domain(_stages.map(function(d) {return d.case_pathologic_stage}));
     };
 
     var createPlot = function () {
@@ -194,6 +197,7 @@ $(function () {
                 })
                 .attr('visibility', visibility_func);
 
+            svg.select(".axis.x").transition().duration(150).call(xAxis);
         }
     };
 
@@ -281,7 +285,9 @@ $(function () {
          */
         var gender_legend = d3.select('.gender-legend')
             .selectAll('.gender-legened--item')
-            .data([{case_gender: 'MALE'}, {case_gender: 'FEMALE'}])
+            .data(_.map(gender_visibility_map, function (val, key) {
+                return {case_gender: key};
+            }).sort())
             .enter()
             .append('p')
             .attr('class', 'gender-legend--item clickable');
