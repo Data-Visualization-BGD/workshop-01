@@ -31,6 +31,7 @@ $(function () {
         width = DEFAULTS.graph_width - margin.left - margin.right,
         height = DEFAULTS.graph_height - margin.top - margin.bottom;
 
+    // We need globally defined Tip
     var Tip;
 
 // set the ranges
@@ -57,10 +58,9 @@ $(function () {
     var disease_visibility_map = {};
     var gender_visibility_map = {};
 
-    var symbol = d3.symbol();
     var color20 = d3.scaleOrdinal(d3.schemeCategory20c);
 
-    var DOT_SHAPE = symbol.type(function(d){
+    var DOT_SHAPE = d3.symbol().type(function(d){
         if (d.case_gender === 'MALE') {
             return d3.symbolTriangle;
         }
