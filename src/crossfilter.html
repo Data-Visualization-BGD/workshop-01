@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>workshop-01-cf</title>
+        <link rel="stylesheet" type="text/css" href="crossfilter/dc.css">
+        <style type="text/css">
+            body {
+                font-family: sans-serif;
+            }
+            h1, h2, p {
+                margin: 0;
+                padding: 10px 0;
+                color: #333;
+                line-height: 20px;
+            }
+            a {
+                color: inherit;
+            }
+            .dc-chart g.row text { fill: black; }
+        </style>
+    </head>
+    <body>
+        <h1>workshop-01-crossfilter <span id="count"><span class="filter-count"></span> / <span class="total-count"></span></h1>
+        <div style="display: flex; flex-direction: row; flex-wrap: nowrap">
+            <div id="disease" style="display: flex; flex-direction: column">
+                <h2>diseases
+                    <a href="javascript:diseaseGraph.filterAll();dc.redrawAll();">filter reset</a>
+                </h2>
+                <div></div>
+            </div>
+            <div style="display: flex; flex-direction: column">
+                <div id="gender">
+                    <h2>gender
+                        <a href="javascript:genderGraph.filterAll();dc.redrawAll();">filter reset</a>
+                    </h2>
+                    <div></div>
+                </div>
+                <div id="stage">
+                    <h2>stage
+                        <a href="javascript:stageGraph.filterAll();dc.redrawAll();">filter reset</a>
+                    </h2>
+                    <div></div>
+                </div>
+            </div>
+            <div style="display: flex; flex-direction: column">
+                <div id="age">
+                    <h2>age
+                        <a href="javascript:ageGraph.filterAll();dc.redrawAll();">filter reset</a>
+                    </h2>
+                    <div></div>
+                </div>
+                <div id="days" style="display: flex; flex-direction: column">
+                    <h2>years
+                        <a href="javascript:daysChart.filterAll();dc.redrawAll();">filter reset</a>
+                    </h2>
+                    <div></div>
+                </div>
+            </div>
+        </div>
+
+        <script src="crossfilter/d3.js"></script>
+        <script src="crossfilter/crossfilter.js"></script>
+        <script src="crossfilter/dc.js"></script>
+
+        <script type="text/javascript">
+            var formatPercent = d3.format('.0%');
+            var diseaseGraph = dc.rowChart('#disease div'),
+                genderGraph = dc.rowChart('#gender div'),
+                stageGraph = dc.rowChart('#stage div'),
+                ageGraph = dc.barChart('#age div'),
+                daysChart = dc.barChart("#days"),
+                counterWidget = dc.dataCount("#count");;
+
+            function row(d) {
+                return {
+                    id: d.case_id,
+                    gender: d.case_gender,
+                    disease: d.case_disease_type,
+                    stage: d.case_pathologic_stage,
+                    age: +d.case_age_at_diagnosis,
+                    days: +d.case_days_to_death
+                }
+            }
+
+            d3.tsv('../tcga-cases.tsv', row, function(error, data) {
+                var ndx = crossfilter(data),
+                    all = ndx.groupAll(),
+                    gender_dim = ndx.dimension(function(d) { return d.gender; }),
+                    disease_dim = ndx.dimension(function(d) { return d.disease; }),
+                    stage_dim = ndx.dimension(function(d) { return d.stage; }),
+                    age_dim = ndx.dimension(function(d) { return d.age; }),
+                    days_dim = ndx.dimension(function(d) { return d.days; });
+
+                    diseaseGraph
+                        .width(600)
+                        .height(800)
+                        .dimension(disease_dim)
+                        .group(disease_dim.group())
+                        .elasticX(true)
+                        .gap(1)
+                        .colors(d3.scale.category20())
+                        .label(function(d) {
+                            if (diseaseGraph.hasFilter() && !diseaseGraph.hasFilter(d.key)) return d.key + " (N/A)";
+                            return d.key + " (" + formatPercent(d.value / all.value()) + ")";
+                        })
+                        .renderLabel(true)
+                        .title(function(d) {
+                            if (diseaseGraph.hasFilter() && !diseaseGraph.hasFilter(d.key)) return d.key + " (N/A)";
+                            return d.key + " (" + formatPercent(d.value / all.value()) + ")";
+                        })
+                        .renderTitle(true);
+
+                    genderGraph
+                        .width(300)
+                        .height(200)
+                        .dimension(gender_dim)
+                        .group(gender_dim.group())
+                        .elasticX(true)
+                        .ordinalColors(['#fa4b3f', '#1f77b4'])
+                        .label(function(d) {
+                            if (genderGraph.hasFilter() && !genderGraph.hasFilter(d.key)) return d.key + " (N/A)";
+                            return d.key + " (" + formatPercent(d.value / all.value()) + ")";
+                        })
+                        .renderLabel(true)
+                        .title(function(d) {
+                            if (genderGraph.hasFilter() && !genderGraph.hasFilter(d.key)) return d.key + " (N/A)";
+                            return d.key + " (" + formatPercent(d.value / all.value()) + ")";
+                        })
+                        .renderTitle(true);
+
+                    stageGraph
+                        .width(300)
+                        .height(550 )
+                        .dimension(stage_dim)
+                        .group(stage_dim.group())
+                        .elasticX(true)
+                        .gap(1)
+                        .colors(d3.scale.category10())
+                        .label(function(d) {
+                            if (stageGraph.hasFilter() && !stageGraph.hasFilter(d.key)) return d.key + " (N/A)";
+                            return d.key + " (" + formatPercent(d.value / all.value()) + ")";
+                        })
+                        .renderLabel(true)
+                        .title(function(d) {
+                            if (stageGraph.hasFilter() && !stageGraph.hasFilter(d.key)) return d.key + " (N/A)";
+                            return d.key + " (" + formatPercent(d.value / all.value()) + ")";
+                        })
+                        .renderTitle(true);
+
+                    ageGraph
+                        .width(800)
+                        .height(350 )
+                        .dimension(age_dim)
+                        .group(age_dim.group())
+                        .colors(d3.scale.category10())
+                        .x(d3.scale.linear().domain([10,80]))
+                        .elasticY(true);;
+
+                    daysChart
+                        .width(800)
+                        .height(400)
+                        .dimension(days_dim)
+                        .group(days_dim.group().reduceCount(function(d) { return d.days/365}))
+                        .x(d3.scale.linear().domain([0,30]))
+                        .elasticY(true);
+
+                    counterWidget
+                        .dimension(ndx)
+                        .group(all);
+
+                    dc.renderAll();
+            });
+        </script>
+    </body>
+</html>
